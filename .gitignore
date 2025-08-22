@@ -2,6 +2,8 @@ __pycache__
 .venv
 .env
 mcp-pagoda.log
+package.json
+package-lock.json
 
 ### Vim ###
 # swap

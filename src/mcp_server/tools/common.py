@@ -1,6 +1,5 @@
 import json
-
-from mcp.types import TextContent
+from typing import Optional
 
 from mcp_server.drivers.pagoda import (
     advanced_search_api,
@@ -10,164 +9,160 @@ from mcp_server.drivers.pagoda import (
     get_model_list_api,
     search_item_api,
 )
-from mcp_server.lib import PagodaCert, ToolHandler
-from mcp_server.model import (
-    AdvancedSearch,
-    AdvancedSearchAttrInfo,
-    ItemDetailInput,
-    ItemList,
-    ModelDetailInput,
-    ModelList,
-    SearchItem,
-)
+from mcp_server.model import AdvancedSearchAttrInfo
 
 
-def get_model_list(cert: PagodaCert, args: dict):
+# FIXME: This refers PagodaDriver
+class Pagoda:
+    """シングルトンパターンを使用したPagodaクライアントクラス"""
+
+    _instance: Optional["Pagoda"] = None
+
+    def __init__(self):
+        # これらの変数はSimpleAzureADOAuthProviderから設定される
+        self.endpoint: str = ""
+        self.token: str = ""
+
+    @classmethod
+    def get_instance(cls) -> "Pagoda":
+        """シングルトンインスタンスを取得"""
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
+
+    @classmethod
+    def initialize(cls, endpoint: str, token: str) -> "Pagoda":
+        """エンドポイントとトークンでPagodaを初期化"""
+        instance = cls.get_instance()
+        instance.endpoint = endpoint
+        instance.token = token
+        return instance
+
+
+def get_pagoda_instance() -> Pagoda:
+    """共通のPagodaインスタンス取得処理"""
+    return Pagoda.get_instance()
+
+
+# This is a MCP tool function
+def get_model_list(search: str = "") -> str:
+    """list all models"""
+    backend = get_pagoda_instance()
+
+    # access to backend service (Pagoda)
     model_list = get_model_list_api(
-        endpoint=cert.endpoint,
-        token=cert.token,
-        search=args["search"],
+        endpoint=backend.endpoint,
+        token=backend.token,
+        search=search,
     )
 
-    return [
-        TextContent(
-            type="text",
-            text=json.dumps(
-                [
-                    {
-                        "id": model.id,
-                        "name": model.name,
-                        "note": model.note,
-                    }
-                    for model in model_list
-                ]
-            ),
-        )
-    ]
+    return json.dumps(
+        [
+            {
+                "id": model.id,
+                "name": model.name,
+                "note": model.note,
+            }
+            for model in model_list
+        ]
+    )
 
 
-def get_model_detail(cert: PagodaCert, args: dict):
+def get_model_detail(model_id: int) -> str:
+    """get model detail"""
+    backend = get_pagoda_instance()
+
     model_detail = get_model_detail_api(
-        endpoint=cert.endpoint,
-        token=cert.token,
-        model_id=int(args["model_id"]),
+        endpoint=backend.endpoint,
+        token=backend.token,
+        model_id=model_id,
     )
 
-    return [
-        TextContent(
-            type="text",
-            text=json.dumps(model_detail.model_dump()),
-        )
-    ]
+    return json.dumps(model_detail.model_dump())
 
 
-def get_item_list(cert: PagodaCert, args: dict):
+def get_item_list(model_id: int, search: str = "") -> str:
+    """list all items for a model"""
+    backend = get_pagoda_instance()
+
     item_list = get_item_list_api(
-        endpoint=cert.endpoint,
-        token=cert.token,
-        model_id=int(args["model_id"]),
-        search=args["search"],
+        endpoint=backend.endpoint,
+        token=backend.token,
+        model_id=model_id,
+        search=search,
     )
-    return [
-        TextContent(
-            type="text",
-            text=json.dumps(
-                [
-                    {
-                        "id": item.id,
-                        "name": item.name,
-                        "schema": item.model.name,
-                    }
-                    for item in item_list
-                ]
-            ),
-        )
-    ]
+
+    return json.dumps(
+        [
+            {
+                "id": item.id,
+                "name": item.name,
+                "schema": item.model.name,
+            }
+            for item in item_list
+        ]
+    )
 
 
-def get_item_detail(cert: PagodaCert, args: dict):
-    # call request to get item detail
+def get_item_detail(item_id: int) -> str:
+    """get item detail"""
+    backend = get_pagoda_instance()
+
     item_detail = get_item_detail_api(
-        endpoint=cert.endpoint,
-        token=cert.token,
-        item_id=int(args["item_id"]),
+        endpoint=backend.endpoint,
+        token=backend.token,
+        item_id=item_id,
     )
 
-    return [
-        TextContent(
-            type="text",
-            text=json.dumps(item_detail.model_dump()),
-        )
-    ]
+    return json.dumps(item_detail.model_dump())
 
 
-def search_item(
-    cert: PagodaCert,
-    args: dict,
-):
+def search_item(query: str) -> str:
+    """search items by partial match of the item name"""
+    backend = get_pagoda_instance()
+
     item_list = search_item_api(
-        endpoint=cert.endpoint,
-        token=cert.token,
-        query=args["query"],
+        endpoint=backend.endpoint,
+        token=backend.token,
+        query=query,
     )
 
-    return [
-        TextContent(
-            type="text",
-            text=json.dumps([item.model_dump() for item in item_list]),
-        )
-    ]
+    return json.dumps([item.model_dump() for item in item_list])
 
 
 def advanced_search(
-    cert: PagodaCert,
-    args: dict,
-):
+    entities: list,
+    attrinfo: list,
+    item_filter_key: int = 0,
+    item_keyword: str = "",
+    has_referral: bool = False,
+    referral_name: str = "",
+    limit: int = 100,
+    offset: int = 0,
+) -> str:
+    """advanced search for items"""
+    backend = get_pagoda_instance()
+
     result = advanced_search_api(
-        endpoint=cert.endpoint,
-        token=cert.token,
-        entities=args["entities"],
-        attrinfos=[AdvancedSearchAttrInfo(**attrinfo) for attrinfo in args["attrinfo"]],
-        item_filter_key=args.get("item_filter_key", 0),
-        item_keyword=args.get("item_keyword", ""),
-        has_referral=args.get("has_referral", False),
-        referral_name=args.get("referral_name", ""),
-        limit=args.get("limit", 100),
-        offset=args.get("offset", 0),
+        endpoint=backend.endpoint,
+        token=backend.token,
+        entities=entities,
+        attrinfos=[AdvancedSearchAttrInfo(**info) for info in attrinfo],
+        item_filter_key=item_filter_key,
+        item_keyword=item_keyword,
+        has_referral=has_referral,
+        referral_name=referral_name,
+        limit=limit,
+        offset=offset,
     )
-    return [
-        TextContent(
-            type="text",
-            text=json.dumps(result.model_dump()),
-        )
-    ]
+    return json.dumps(result.model_dump())
 
 
-TOOL_COMMON_ROUTERS = {
-    "model_list": ToolHandler(
-        handler=get_model_list, desc="list all models", input_schema=ModelList
-    ),
-    "model_detail": ToolHandler(
-        handler=get_model_detail, desc="get model detail", input_schema=ModelDetailInput
-    ),
-    "item_list": ToolHandler(
-        handler=get_item_list, desc="list all items", input_schema=ItemList
-    ),
-    "item_detail": ToolHandler(
-        handler=get_item_detail, desc="get item detail", input_schema=ItemDetailInput
-    ),
-    "search_item": ToolHandler(
-        handler=search_item,
-        desc="Returns a list of items by partial match of the item name",
-        input_schema=SearchItem,
-    ),
-    "advanced_search": ToolHandler(
-        handler=advanced_search,
-        desc="""
-Returns a list of item details.
-Filter by selecting attributes.
-Also returns the referenced items.
-""",
-        input_schema=AdvancedSearch,
-    ),
-}
+COMMON_LIST = [
+    get_model_list,
+    get_model_detail,
+    get_item_list,
+    get_item_detail,
+    search_item,
+    advanced_search,
+]

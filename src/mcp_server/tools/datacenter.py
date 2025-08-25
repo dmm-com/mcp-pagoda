@@ -1,29 +1,27 @@
 import json
 
-from mcp.types import TextContent
-from pydantic import BaseModel
-
 from mcp_server.drivers.pagoda import advanced_search_api, get_model_id
-from mcp_server.lib import PagodaCert, ToolHandler
 from mcp_server.model import AdvancedSearchAttrInfo
+from mcp_server.tools.common import get_pagoda_instance
+
+ATTRNAME_UNIT = "ユニット数"
 
 ATTRNAME_UNIT = "ユニット数"
 
 
-class RackList(BaseModel):
-    floor_name: str = ""
+def get_rack_list(floor_name: str) -> str:
+    """list all racks"""
+    backend = get_pagoda_instance()
 
-
-def get_rack_list(cert: PagodaCert, arguments: dict):
     rack_model_id = get_model_id(
-        endpoint=cert.endpoint,
-        token=cert.token,
+        endpoint=backend.endpoint,
+        token=backend.token,
         search="ラック",
     )
 
     row_results = advanced_search_api(
-        endpoint=cert.endpoint,
-        token=cert.token,
+        endpoint=backend.endpoint,
+        token=backend.token,
         entities=[rack_model_id],
         attrinfos=[
             AdvancedSearchAttrInfo(name=ATTRNAME_UNIT),
@@ -31,13 +29,13 @@ def get_rack_list(cert: PagodaCert, arguments: dict):
             AdvancedSearchAttrInfo(
                 name="フロア",
                 filter_key=3,
-                keyword=arguments["floor_name"],
+                keyword=floor_name,
             ),
         ],
     )
 
     results = []
-    for row_result in row_results:
+    for row_result in row_results.values:
         try:
             unit_count = int(row_result.attrs[ATTRNAME_UNIT]["value"]["as_string"])
         except (KeyError, ValueError):
@@ -59,11 +57,7 @@ def get_rack_list(cert: PagodaCert, arguments: dict):
             result["RackSpace"][str(unit_number)] = rack_space
         results.append(result)
 
-    return [TextContent(type="text", text=json.dumps(results))]
+    return json.dumps({"rack_list": results})
 
 
-TOOL_DC_ROUTERS = {
-    "rack_list": ToolHandler(
-        handler=get_rack_list, desc="list all racks", input_schema=RackList
-    ),
-}
+DC_LIST = [get_rack_list]

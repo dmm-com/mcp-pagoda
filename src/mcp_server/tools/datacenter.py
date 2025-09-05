@@ -1,27 +1,28 @@
 import json
 
 from mcp_server.drivers.pagoda import advanced_search_api, get_model_id
+from mcp.server.fastmcp import Context
 from mcp_server.model import AdvancedSearchAttrInfo
-from mcp_server.tools.common import get_pagoda_instance
+from mcp_server.tools.common import get_backend_param
 
 ATTRNAME_UNIT = "ユニット数"
 
 ATTRNAME_UNIT = "ユニット数"
 
 
-def get_rack_list(floor_name: str) -> str:
+def get_rack_list(floor_name: str, ctx: Context) -> str:
     """list all racks"""
-    backend = get_pagoda_instance()
+    endpoint, token = get_backend_param(ctx)
 
     rack_model_id = get_model_id(
-        endpoint=backend.endpoint,
-        token=backend.token,
+        endpoint=endpoint,
+        token=token,
         search="ラック",
     )
 
     row_results = advanced_search_api(
-        endpoint=backend.endpoint,
-        token=backend.token,
+        endpoint=endpoint,
+        token=token,
         entities=[rack_model_id],
         attrinfos=[
             AdvancedSearchAttrInfo(name=ATTRNAME_UNIT),

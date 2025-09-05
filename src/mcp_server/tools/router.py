@@ -1,16 +1,17 @@
 import json
 
+from mcp.server.fastmcp import Context
 from mcp_server.drivers.pagoda import get_router_topology
-from mcp_server.tools.common import get_pagoda_instance
+from mcp_server.tools.common import get_backend_param
 
 
-def router_topology() -> str:
+def router_topology(ctx: Context) -> str:
     """Get router topology"""
-    backend = get_pagoda_instance()
+    endpoint, token = get_backend_param(ctx)
 
     topology = get_router_topology(
-        endpoint=backend.endpoint,
-        token=backend.token,
+        endpoint=endpoint,
+        token=token,
     )
 
     return json.dumps(topology)

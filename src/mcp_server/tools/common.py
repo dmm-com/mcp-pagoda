@@ -1,6 +1,8 @@
 import json
 from typing import Optional
 
+from mcp.server.fastmcp import Context
+
 from mcp_server.drivers.pagoda import (
     advanced_search_api,
     get_item_detail_api,
@@ -21,7 +23,7 @@ class Pagoda:
     def __init__(self):
         # これらの変数はSimpleAzureADOAuthProviderから設定される
         self.endpoint: str = ""
-        self.token: str = ""
+        self.token: str | None = None
 
     @classmethod
     def get_instance(cls) -> "Pagoda":
@@ -31,28 +33,34 @@ class Pagoda:
         return cls._instance
 
     @classmethod
-    def initialize(cls, endpoint: str, token: str) -> "Pagoda":
+    def initialize(cls, endpoint: str, token: str, is_bearer: bool) -> "Pagoda":
         """エンドポイントとトークンでPagodaを初期化"""
         instance = cls.get_instance()
         instance.endpoint = endpoint
         instance.token = token
+        instance.is_bearer = is_bearer
         return instance
 
 
-def get_pagoda_instance() -> Pagoda:
-    """共通のPagodaインスタンス取得処理"""
-    return Pagoda.get_instance()
+def get_backend_param(ctx: Context = None) -> tuple[str, str]:
+    pagoda_instance = Pagoda.get_instance()
+    if pagoda_instance.token is None or pagoda_instance.is_bearer:
+        return (
+            pagoda_instance.endpoint,
+            ctx.request_context.request.user.access_token.token,
+        )
+    return pagoda_instance.endpoint, pagoda_instance.token
 
 
 # This is a MCP tool function
-def get_model_list(search: str = "") -> str:
+def get_model_list(search: str = "", ctx: Context = None) -> str:
     """list all models"""
-    backend = get_pagoda_instance()
+    endpoint, token = get_backend_param(ctx)
 
     # access to backend service (Pagoda)
     model_list = get_model_list_api(
-        endpoint=backend.endpoint,
-        token=backend.token,
+        endpoint=endpoint,
+        token=token,
         search=search,
     )
 
@@ -68,26 +76,26 @@ def get_model_list(search: str = "") -> str:
     )
 
 
-def get_model_detail(model_id: int) -> str:
+def get_model_detail(model_id: int, ctx: Context) -> str:
     """get model detail"""
-    backend = get_pagoda_instance()
+    endpoint, token = get_backend_param(ctx)
 
     model_detail = get_model_detail_api(
-        endpoint=backend.endpoint,
-        token=backend.token,
+        endpoint=endpoint,
+        token=token,
         model_id=model_id,
     )
 
     return json.dumps(model_detail.model_dump())
 
 
-def get_item_list(model_id: int, search: str = "") -> str:
+def get_item_list(model_id: int, search: str = "", ctx: Context = None) -> str:
     """list all items for a model"""
-    backend = get_pagoda_instance()
+    endpoint, token = get_backend_param(ctx)
 
     item_list = get_item_list_api(
-        endpoint=backend.endpoint,
-        token=backend.token,
+        endpoint=endpoint,
+        token=token,
         model_id=model_id,
         search=search,
     )
@@ -104,26 +112,26 @@ def get_item_list(model_id: int, search: str = "") -> str:
     )
 
 
-def get_item_detail(item_id: int) -> str:
+def get_item_detail(item_id: int, ctx: Context) -> str:
     """get item detail"""
-    backend = get_pagoda_instance()
+    endpoint, token = get_backend_param(ctx)
 
     item_detail = get_item_detail_api(
-        endpoint=backend.endpoint,
-        token=backend.token,
+        endpoint=endpoint,
+        token=token,
         item_id=item_id,
     )
 
     return json.dumps(item_detail.model_dump())
 
 
-def search_item(query: str) -> str:
+def search_item(query: str, ctx: Context) -> str:
     """search items by partial match of the item name"""
-    backend = get_pagoda_instance()
+    endpoint, token = get_backend_param(ctx)
 
     item_list = search_item_api(
-        endpoint=backend.endpoint,
-        token=backend.token,
+        endpoint=endpoint,
+        token=token,
         query=query,
     )
 
@@ -139,13 +147,14 @@ def advanced_search(
     referral_name: str = "",
     limit: int = 100,
     offset: int = 0,
+    ctx: Context = None,
 ) -> str:
     """advanced search for items"""
-    backend = get_pagoda_instance()
+    endpoint, token = get_backend_param(ctx)
 
     result = advanced_search_api(
-        endpoint=backend.endpoint,
-        token=backend.token,
+        endpoint=endpoint,
+        token=token,
         entities=entities,
         attrinfos=[AdvancedSearchAttrInfo(**info) for info in attrinfo],
         item_filter_key=item_filter_key,

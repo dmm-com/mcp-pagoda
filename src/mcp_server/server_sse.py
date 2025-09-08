@@ -61,13 +61,9 @@ def create_mcp_server(
         # By using the server.tool() decorator, each tool function can be registered to the MCP server
         server.tool()(func)
 
-    # NOTE: This is temporary way because the Claude causes an error
-    #       when retrieving the list of prompts.
-    """
     for title, func in PROMPT_LIST:
         # By using the server.prompt() decorator, each prompt function can be registered to the MCP server
         server.prompt(title=title)(func)
-    """
 
     return server
 

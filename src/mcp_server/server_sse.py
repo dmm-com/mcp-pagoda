@@ -66,9 +66,9 @@ def create_mcp_server(
     for title, func in PROMPT_LIST:
         # By using the server.prompt() decorator, each prompt function can be registered to the MCP server
         server.prompt(title=title)(func)
+    """
 
     return server
-    """
 
 
 def serve(

@@ -4,7 +4,7 @@ from typing import Callable
 import requests
 from pydantic import BaseModel, Field
 
-from mcp_server.lib import Logger
+from mcp_server.lib.log import Logger
 from mcp_server.model import AdvancedSearchAttrInfo
 
 

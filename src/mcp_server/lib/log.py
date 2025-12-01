@@ -13,7 +13,6 @@ my_handler = RotatingFileHandler(
     delay=0,
 )
 my_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
-my_handler.setLevel(logging.WARNING)
 
 Logger = logging.getLogger(__name__)
 Logger.setLevel(logging.WARNING)

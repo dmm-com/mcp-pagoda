@@ -22,9 +22,7 @@ load_dotenv()
     "--loglevel",
     "-l",
     help="Log level",
-    type=click.Choice(
-        ["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"], case_sensitive=False
-    ),
+    type=click.Choice(["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"], case_sensitive=False),
     default="INFO",
 )
 @click.option(

@@ -95,9 +95,7 @@ class SimpleAzureADOAuthProvider(OAuthAuthorizationServerProvider):
         self.state_mapping[state] = {
             "redirect_uri": str(params.redirect_uri),
             "code_challenge": params.code_challenge,
-            "redirect_uri_provided_explicitly": str(
-                params.redirect_uri_provided_explicitly
-            ),
+            "redirect_uri_provided_explicitly": str(params.redirect_uri_provided_explicitly),
             "client_id": client.client_id,
         }
 
@@ -122,9 +120,7 @@ class SimpleAzureADOAuthProvider(OAuthAuthorizationServerProvider):
 
         redirect_uri = state_data["redirect_uri"]
         code_challenge = state_data["code_challenge"]
-        redirect_uri_provided_explicitly = (
-            state_data["redirect_uri_provided_explicitly"] == "True"
-        )
+        redirect_uri_provided_explicitly = state_data["redirect_uri_provided_explicitly"] == "True"
         client_id = state_data["client_id"]
 
         # Exchange code for token with Azure AD
@@ -143,9 +139,7 @@ class SimpleAzureADOAuthProvider(OAuthAuthorizationServerProvider):
             )
 
             if response.status_code != 200:
-                raise HTTPException(
-                    400, f"Failed to exchange code for token: {response.text}"
-                )
+                raise HTTPException(400, f"Failed to exchange code for token: {response.text}")
 
             data = response.json()
 
@@ -310,9 +304,7 @@ class SimpleAzureADOAuthProvider(OAuthAuthorizationServerProvider):
         """Exchange refresh token"""
         raise NotImplementedError("Not supported")
 
-    async def revoke_token(
-        self, token: str, token_type_hint: str | None = None
-    ) -> None:
+    async def revoke_token(self, token: str, token_type_hint: str | None = None) -> None:
         """Revoke a token."""
         if token in self.tokens:
             del self.tokens[token]
@@ -325,9 +317,7 @@ def get_azure_mcp_server(host: str, port: int) -> FastMCP:
         # No hardcoded credentials - all from environment variables
         settings = AzureServerSettings(host=host, port=port)
     except ValueError as e:
-        logger.error(
-            "Failed to load settings. Make sure environment variables are set:"
-        )
+        logger.error("Failed to load settings. Make sure environment variables are set:")
         logger.error("  MCP_AZURE_AZURE_TENANT_ID=<your-tenant-id>")
         logger.error("  MCP_AZURE_AZURE_CLIENT_ID=<your-client-id>")
         logger.error("  MCP_AZURE_AZURE_CLIENT_SECRET=<your-client-secret>")
@@ -365,9 +355,7 @@ def get_azure_mcp_server(host: str, port: int) -> FastMCP:
         error = request.query_params.get("error")
 
         if error:
-            error_description = request.query_params.get(
-                "error_description", "Unknown error"
-            )
+            error_description = request.query_params.get("error_description", "Unknown error")
             raise HTTPException(400, f"Azure AD error: {error} - {error_description}")
 
         if not code or not state:

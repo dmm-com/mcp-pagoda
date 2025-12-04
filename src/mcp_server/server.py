@@ -51,9 +51,7 @@ async def serve(endpoint: str, token: str) -> None:
     @server.call_tool()
     async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         if name in TOOL_ROUTERS:
-            return TOOL_ROUTERS[name].handler(
-                PagodaCert(endpoint=endpoint, token=token), arguments
-            )
+            return TOOL_ROUTERS[name].handler(PagodaCert(endpoint=endpoint, token=token), arguments)
         else:
             raise ValueError(f"Unknown tool name: {name}")
 

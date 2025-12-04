@@ -16,9 +16,7 @@ def is_token_valid(pagoda_url_base: str, token: str) -> bool:
         "Authorization": "Token " + token,
     }
 
-    response = http_request_get(
-        url=f"{pagoda_url_base}/user/api/v2/token/", headers=headers
-    )
+    response = http_request_get(url=f"{pagoda_url_base}/user/api/v2/token/", headers=headers)
     if response is None:
         return False
 

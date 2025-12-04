@@ -81,9 +81,7 @@ def serve(
     # initialize Pagoda instance
     from mcp_server.tools.common import Pagoda
 
-    Pagoda.initialize(
-        endpoint=endpoint, token=token, is_bearer=(auth_method == "bearer")
-    )
+    Pagoda.initialize(endpoint=endpoint, token=token, is_bearer=(auth_method == "bearer"))
 
     mcp_server = create_mcp_server(host, port, endpoint, auth_method)
     mcp_server.run(transport="sse")

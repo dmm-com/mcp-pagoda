@@ -1,6 +1,8 @@
 import logging
 from logging.handlers import RotatingFileHandler
 
+from mcp.server.fastmcp import Context
+
 # This configured considers max filesize of logfile and logrotation.
 # This must be more secure than using logging.basicConfig() for
 # CVE-2018-0285, CVE-2000-1127 and others.
@@ -17,3 +19,9 @@ my_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s
 Logger = logging.getLogger(__name__)
 Logger.setLevel(logging.WARNING)
 Logger.addHandler(my_handler)
+
+
+def get_prefix(ctx: Context) -> str:
+    request = ctx.request_context.request
+    client_id = ctx.client_id
+    return f"[From:{request.client.host} ClientID:{client_id}] "

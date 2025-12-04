@@ -2,10 +2,9 @@ import json
 from typing import Callable
 
 import requests
-from pydantic import BaseModel, Field
-
 from mcp_server.lib.log import Logger
 from mcp_server.model import AdvancedSearchAttrInfo
+from pydantic import BaseModel, Field
 
 
 class ModelBase(BaseModel):
@@ -89,8 +88,9 @@ def get_model_list_api(
     endpoint: str,
     token: str,
     search: str = "",
+    log_prefix: str = "",
 ) -> list[Model]:
-    Logger.debug(f"get_model_list_api(Input) search={search}")
+    Logger.debug(log_prefix + f"get_model_list_api(Input) search={search}")
     results = []
     limit = 100
     offset = 0
@@ -113,7 +113,7 @@ def get_model_list_api(
             break
         offset += limit
 
-    Logger.debug(f"get_model_list_api(Output) {results}")
+    Logger.debug(log_prefix + f"get_model_list_api(Output) {results}")
     return [Model(**result) for result in results]
 
 
@@ -122,8 +122,9 @@ def get_item_list_api(
     token: str,
     model_id: int,
     search: str = "",
+    log_prefix: str = "",
 ) -> list[Item]:
-    Logger.debug(f"get_item_list_api(Input) model_id={model_id}, search={search}")
+    Logger.debug(log_prefix + f"get_item_list_api(Input) model_id={model_id}, search={search}")
     results = []
     page = 1
     while True:
@@ -144,7 +145,7 @@ def get_item_list_api(
             break
         page += 1
 
-    Logger.debug(f"get_item_list_api(Output) {results}")
+    Logger.debug(log_prefix + f"get_item_list_api(Output) {results}")
     return [Item(**result) for result in results]
 
 
@@ -159,9 +160,10 @@ def advanced_search_api(
     referral_name: str = "",
     limit: int = 100,
     offset: int = 0,
+    log_prefix: str = "",
 ) -> AdvancedSearchResult:
     Logger.debug(
-        f"advanced_search_api(Input) entities={entities}, attrinfos={attrinfos}, "
+        log_prefix + f"advanced_search_api(Input) entities={entities}, attrinfos={attrinfos}, "
         f"item_filter_key={item_filter_key}, item_keyword={item_keyword},"
         f"has_referral={has_referral}, referral_name={referral_name}"
     )
@@ -186,7 +188,7 @@ def advanced_search_api(
     if resp.status_code != 200:
         raise RuntimeError("Request failed /entry/api/v2/advanced_search/")
 
-    Logger.debug(f"advanced_search_api(Output) {resp.json()}")
+    Logger.debug(log_prefix + f"advanced_search_api(Output) {resp.json()}")
     return AdvancedSearchResult(**resp.json())
 
 
@@ -210,12 +212,13 @@ def get_model_detail_api(
     endpoint: str,
     token: str,
     model_id: int,
+    log_prefix: str = "",
 ) -> ModelDetail:
     """
     This retrieves model details from the Pagoda API.
     e.g. https://airone.dmmlabs.jp/entity/api/v2/533972/
     """
-    Logger.debug(f"get_model_detail_api(Input) model_id={model_id}")
+    Logger.debug(log_prefix + f"get_model_detail_api(Input) model_id={model_id}")
     resp = request_get(
         url=endpoint + f"/entity/api/v2/{model_id}/",
         token=token,
@@ -223,7 +226,7 @@ def get_model_detail_api(
     if resp.status_code != 200:
         raise RuntimeError(f"Request failed /entity/api/v2/{model_id}/")
 
-    Logger.debug(f"get_model_detail_api(Output) {resp.json()}")
+    Logger.debug(log_prefix + f"get_model_detail_api(Output) {resp.json()}")
     return ModelDetail(**resp.json())
 
 
@@ -231,12 +234,13 @@ def get_item_detail_api(
     endpoint: str,
     token: str,
     item_id: int,
+    log_prefix: str = "",
 ) -> ItemDetail:
     """
     This retrieves item details from the Pagoda API.
     e.g. https://airone.dmmlabs.jp/entry/api/v2/533972/
     """
-    Logger.debug(f"get_item_detail_api(Input) item_id={item_id}")
+    Logger.debug(log_prefix + f"get_item_detail_api(Input) item_id={item_id}")
     resp = request_get(
         url=endpoint + f"/entry/api/v2/{item_id}/",
         token=token,
@@ -244,7 +248,7 @@ def get_item_detail_api(
     if resp.status_code != 200:
         raise RuntimeError(f"Request failed /entry/api/v2/{item_id}/")
 
-    Logger.debug(f"get_item_detail_api(Output) {resp.json()}")
+    Logger.debug(log_prefix + f"get_item_detail_api(Output) {resp.json()}")
     return ItemDetail(**resp.json())
 
 
@@ -252,8 +256,9 @@ def search_item_api(
     endpoint: str,
     token: str,
     query: str = "",
+    log_prefix: str = "",
 ) -> list[Item]:
-    Logger.debug(f"search_item_api(Input) query={query}")
+    Logger.debug(log_prefix + f"search_item_api(Input) query={query}")
     resp = request_get(
         url=endpoint + "/entry/api/v2/search/",
         params={
@@ -265,18 +270,19 @@ def search_item_api(
         raise RuntimeError("Request failed /api/v2/search/")
     results = resp.json()
 
-    Logger.debug(f"search_item_api(Output) {results}")
+    Logger.debug(log_prefix + f"search_item_api(Output) {results}")
     return [Item(**result) for result in results]
 
 
 def get_router_topology(
     endpoint: str,
     token: str,
+    log_prefix: str = "",
 ) -> list[ItemDetail]:
     """
     This retrieves topology from the Pagoda API.
     """
-    Logger.debug("get_router_topology(Input)")
+    Logger.debug(log_prefix + "get_router_topology(Input)")
     resp = request_get(
         url=endpoint + "/api/v2/custom/network/get_router_topology/",
         params={},
@@ -285,5 +291,5 @@ def get_router_topology(
     if resp.status_code != 200:
         raise RuntimeError("/api/v2/custom/network/get_router_topology/")
 
-    Logger.debug(f"get_router_topology(Output) {resp.json()}")
+    Logger.debug(log_prefix + f"get_router_topology(Output) {resp.json()}")
     return resp.json()

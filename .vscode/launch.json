@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "mcp-server",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/mcp-server",
+            "args": [
+                "--endpoint",
+                "http://localhost:8080/",
+                "--token",
+                "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                "--loglevel",
+                "debug"
+            ],
+            "justMyCode": false,
+        }
+    ]
+}

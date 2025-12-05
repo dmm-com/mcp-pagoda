@@ -1,0 +1,28 @@
+name: Ruff
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      
+      - name: Set up Python
+        run: uv python install
+      
+      - name: Install dependencies
+        run: uv sync
+      
+      - name: Run Ruff
+        run: uv run ruff check --output-format=github .
+
+      - name: Run Ruff format
+        run: uv run ruff format --check .

@@ -1,6 +1,10 @@
 name: Ruff
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   ruff:
@@ -18,7 +22,7 @@ jobs:
         run: uv sync
       
       - name: Run Ruff
-        run: uv run ruff check .
+        run: uv run ruff check --output-format=github .
 
       - name: Run Ruff format
-        run: uv run ruff format .
+        run: uv run ruff format --check .

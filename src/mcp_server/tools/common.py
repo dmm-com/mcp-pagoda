@@ -2,7 +2,6 @@ import json
 from typing import Optional
 
 from mcp.server.fastmcp import Context
-
 from mcp_server.drivers.pagoda import (
     advanced_search_api,
     get_item_detail_api,
@@ -11,6 +10,7 @@ from mcp_server.drivers.pagoda import (
     get_model_list_api,
     search_item_api,
 )
+from mcp_server.lib.log import get_prefix
 from mcp_server.model import AdvancedSearchAttrInfo
 
 
@@ -62,6 +62,7 @@ def get_model_list(search: str = "", ctx: Context = None) -> str:
         endpoint=endpoint,
         token=token,
         search=search,
+        log_prefix=get_prefix(ctx),
     )
 
     return json.dumps(
@@ -84,6 +85,7 @@ def get_model_detail(model_id: int, ctx: Context) -> str:
         endpoint=endpoint,
         token=token,
         model_id=model_id,
+        log_prefix=get_prefix(ctx),
     )
 
     return json.dumps(model_detail.model_dump())
@@ -98,6 +100,7 @@ def get_item_list(model_id: int, search: str = "", ctx: Context = None) -> str:
         token=token,
         model_id=model_id,
         search=search,
+        log_prefix=get_prefix(ctx),
     )
 
     return json.dumps(
@@ -120,6 +123,7 @@ def get_item_detail(item_id: int, ctx: Context) -> str:
         endpoint=endpoint,
         token=token,
         item_id=item_id,
+        log_prefix=get_prefix(ctx),
     )
 
     return json.dumps(item_detail.model_dump())
@@ -133,6 +137,7 @@ def search_item(query: str, ctx: Context) -> str:
         endpoint=endpoint,
         token=token,
         query=query,
+        log_prefix=get_prefix(ctx),
     )
 
     return json.dumps([item.model_dump() for item in item_list])
@@ -163,6 +168,7 @@ def advanced_search(
         referral_name=referral_name,
         limit=limit,
         offset=offset,
+        log_prefix=get_prefix(ctx),
     )
     return json.dumps(result.model_dump())
 

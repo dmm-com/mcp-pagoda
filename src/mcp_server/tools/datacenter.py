@@ -1,11 +1,10 @@
 import json
 
-from mcp_server.drivers.pagoda import advanced_search_api, get_model_id
 from mcp.server.fastmcp import Context
+from mcp_server.drivers.pagoda import advanced_search_api, get_model_id
+from mcp_server.lib.log import get_prefix
 from mcp_server.model import AdvancedSearchAttrInfo
 from mcp_server.tools.common import get_backend_param
-
-ATTRNAME_UNIT = "ユニット数"
 
 ATTRNAME_UNIT = "ユニット数"
 
@@ -33,6 +32,7 @@ def get_rack_list(floor_name: str, ctx: Context) -> str:
                 keyword=floor_name,
             ),
         ],
+        log_prefix=get_prefix(ctx),
     )
 
     results = []

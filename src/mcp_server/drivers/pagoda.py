@@ -124,7 +124,9 @@ def get_item_list_api(
     search: str = "",
     log_prefix: str = "",
 ) -> list[Item]:
-    Logger.debug(log_prefix + f"get_item_list_api(Input) model_id={model_id}, search={search}")
+    Logger.debug(
+        log_prefix + f"get_item_list_api(Input) model_id={model_id}, search={search}"
+    )
     results = []
     page = 1
     while True:
@@ -163,7 +165,8 @@ def advanced_search_api(
     log_prefix: str = "",
 ) -> AdvancedSearchResult:
     Logger.debug(
-        log_prefix + f"advanced_search_api(Input) entities={entities}, attrinfos={attrinfos}, "
+        log_prefix
+        + f"advanced_search_api(Input) entities={entities}, attrinfos={attrinfos}, "
         f"item_filter_key={item_filter_key}, item_keyword={item_keyword},"
         f"has_referral={has_referral}, referral_name={referral_name}"
     )

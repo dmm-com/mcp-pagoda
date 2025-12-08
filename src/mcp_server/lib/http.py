@@ -23,7 +23,9 @@ def http_request_get(url, headers=None, params=None, timeout=10):
             raise ValueError("無効なURLです")
 
         # GETリクエストを送信
-        response = requests.get(url=url, headers=headers, params=params, timeout=timeout)
+        response = requests.get(
+            url=url, headers=headers, params=params, timeout=timeout
+        )
 
         # レスポンスのステータスコードをチェック
         response.raise_for_status()

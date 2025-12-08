@@ -30,7 +30,9 @@ class SearchItem(BaseModel):
 
 
 class AdvancedSearchAttrInfo(BaseModel):
-    name: str = Field(description="Attribute names can be checked in the Model Details tool.")
+    name: str = Field(
+        description="Attribute names can be checked in the Model Details tool."
+    )
     filter_key: Literal[0, 1, 2, 3, 4, 5] = Field(
         default=0,
         description="0=CLEARED, 1=EMPTY, 2=NON_EMPTY, 3=TEXT_CONTAINED, 4=TEXT_NOT_CONTAINED, 5=DUPLICATED",

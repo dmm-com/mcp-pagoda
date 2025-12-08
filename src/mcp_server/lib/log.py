@@ -23,5 +23,4 @@ Logger.addHandler(my_handler)
 
 def get_prefix(ctx: Context) -> str:
     request = ctx.request_context.request
-    client_id = ctx.client_id
-    return f"[From:{request.client.host} ClientID:{client_id}] "
+    return f"[From:{request.client.host}] "

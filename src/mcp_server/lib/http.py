@@ -1,5 +1,6 @@
-import requests
 from urllib.parse import urlparse
+
+import requests
 
 
 def http_request_get(url, headers=None, params=None, timeout=10):

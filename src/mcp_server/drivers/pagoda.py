@@ -54,6 +54,27 @@ class AdvancedSearchResult(BaseModel):
     values: list[AdvancedSearchResultItem]
 
 
+class ItemHistoryParentAttr(BaseModel):
+    id: int
+    name: str
+
+
+class ItemHistoryValue(BaseModel):
+    as_string: str | None = None
+    as_object: dict | None = None
+
+
+class ItemHistory(BaseModel):
+    id: int
+    type: int
+    created_time: str
+    created_user: str
+    curr_value: ItemHistoryValue
+    prev_value: ItemHistoryValue | None
+    prev_id: int | None
+    parent_attr: ItemHistoryParentAttr
+
+
 def request_to_airone(
     method: Callable, url: str, token: str, params: dict | None, data: dict | None
 ) -> requests.Response:
@@ -253,6 +274,38 @@ def get_item_detail_api(
 
     Logger.debug(log_prefix + f"get_item_detail_api(Output) {resp.json()}")
     return ItemDetail(**resp.json())
+
+
+def get_item_histories_api(
+    endpoint: str,
+    token: str,
+    item_id: int,
+    log_prefix: str = "",
+) -> list[ItemHistory]:
+    """
+    This retrieves item histories from the Pagoda API.
+    e.g. https://airone.dmmlabs.jp/entry/api/v2/533972/histories/
+    """
+    Logger.debug(log_prefix + f"get_item_histories_api(Input) item_id={item_id}")
+    results = []
+    page = 1
+
+    while True:
+        resp = request_get(
+            url=endpoint + f"/entry/api/v2/{item_id}/histories/",
+            params={"page": str(page)},
+            token=token,
+        )
+        if resp.status_code != 200:
+            raise RuntimeError(f"Request failed /entry/api/v2/{item_id}/histories/")
+        for result in resp.json()["results"]:
+            results.append(result)
+        if resp.json()["next"] is None:
+            break
+        page += 1
+
+    Logger.debug(log_prefix + f"get_item_histories_api(Output) {results}")
+    return [ItemHistory(**result) for result in results]
 
 
 def search_item_api(

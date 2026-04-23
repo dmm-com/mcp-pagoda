@@ -5,6 +5,7 @@ from mcp.server.fastmcp import Context
 from mcp_server.drivers.pagoda import (
     advanced_search_api,
     get_item_detail_api,
+    get_item_histories_api,
     get_item_list_api,
     get_model_detail_api,
     get_model_list_api,
@@ -172,6 +173,20 @@ def advanced_search(
     return json.dumps(result.model_dump())
 
 
+def get_item_histories(item_id: int, ctx: Context) -> str:
+    """get item histories"""
+    endpoint, token = get_backend_param(ctx)
+
+    histories = get_item_histories_api(
+        endpoint=endpoint,
+        token=token,
+        item_id=item_id,
+        log_prefix=get_prefix(ctx),
+    )
+
+    return json.dumps([history.model_dump() for history in histories])
+
+
 COMMON_LIST = [
     get_model_list,
     get_model_detail,
@@ -179,4 +194,5 @@ COMMON_LIST = [
     get_item_detail,
     search_item,
     advanced_search,
+    get_item_histories,
 ]

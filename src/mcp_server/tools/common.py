@@ -18,6 +18,7 @@ from mcp_server.model import AdvancedSearchAttrInfo
 # FIXME: This refers PagodaDriver
 class Pagoda:
     """Use singleton class of design pattern"""
+
     _instance: Optional["Pagoda"] = None
 
     def __init__(self):

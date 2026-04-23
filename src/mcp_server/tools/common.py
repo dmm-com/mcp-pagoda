@@ -16,8 +16,7 @@ from mcp_server.model import AdvancedSearchAttrInfo
 
 # FIXME: This refers PagodaDriver
 class Pagoda:
-    """シングルトンパターンを使用したPagodaクライアントクラス"""
-
+    """Use singleton class of design pattern"""
     _instance: Optional["Pagoda"] = None
 
     def __init__(self):
@@ -27,14 +26,14 @@ class Pagoda:
 
     @classmethod
     def get_instance(cls) -> "Pagoda":
-        """シングルトンインスタンスを取得"""
+        """get singleton class"""
         if cls._instance is None:
             cls._instance = cls()
         return cls._instance
 
     @classmethod
     def initialize(cls, endpoint: str, token: str, is_bearer: bool) -> "Pagoda":
-        """エンドポイントとトークンでPagodaを初期化"""
+        """initialize each attributes"""
         instance = cls.get_instance()
         instance.endpoint = endpoint
         instance.token = token

@@ -276,17 +276,17 @@ def get_item_detail_api(
     return ItemDetail(**resp.json())
 
 
-def get_item_histories_api(
+def get_item_history_api(
     endpoint: str,
     token: str,
     item_id: int,
     log_prefix: str = "",
 ) -> list[ItemHistory]:
     """
-    This retrieves item histories from the Pagoda API.
+    This retrieves item history from the Pagoda API.
     e.g. https://airone.dmmlabs.jp/entry/api/v2/533972/histories/
     """
-    Logger.debug(log_prefix + f"get_item_histories_api(Input) item_id={item_id}")
+    Logger.debug(log_prefix + f"get_item_history_api(Input) item_id={item_id}")
     results = []
     page = 1
 
@@ -304,7 +304,7 @@ def get_item_histories_api(
             break
         page += 1
 
-    Logger.debug(log_prefix + f"get_item_histories_api(Output) {results}")
+    Logger.debug(log_prefix + f"get_item_history_api(Output) {results}")
     return [ItemHistory(**result) for result in results]
 
 

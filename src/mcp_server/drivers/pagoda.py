@@ -82,6 +82,19 @@ def get_user_activity_api(
 
     Logger.debug(log_prefix + f"get_user_activity_api(Output) {resp.json()}")
     return resp.json()
+  
+  
+class CoUser(BaseModel):
+    user_id: int
+    username: str
+    email: str
+
+
+class User(BaseModel):
+    user_id: int
+    username: str
+    email: str
+    co_users: list[CoUser] | None
 
 
 def request_to_airone(
@@ -289,6 +302,23 @@ def get_item_detail_api(
 
     Logger.debug(log_prefix + f"get_item_detail_api(Output) {resp.json()}")
     return ItemDetail(**resp.json())
+
+
+def get_me_api(
+    endpoint: str,
+    token: str,
+    log_prefix: str = "",
+) -> User:
+    Logger.debug(log_prefix + "get_me_api(Input)")
+    resp = request_get(
+        url=endpoint + "/user/api/v2/me",
+        token=token,
+    )
+    if resp.status_code != 200:
+        raise RuntimeError("Request failed /user/api/v2/me")
+
+    Logger.debug(log_prefix + f"get_me_api(Output) {resp.json()}")
+    return User(**resp.json())
 
 
 def restore_item_attribute_value_api(

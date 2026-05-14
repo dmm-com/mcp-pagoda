@@ -9,6 +9,7 @@ from mcp_server.drivers.pagoda import (
     get_me_api,
     get_model_detail_api,
     get_model_list_api,
+    restore_item_attribute_value_api,
     search_item_api,
 )
 from mcp_server.lib.log import get_prefix
@@ -186,6 +187,20 @@ def get_me(ctx: Context = None) -> str:
 
     return json.dumps(user.model_dump())
 
+  
+def restore_item_attribute_value(attribute_value_id: int, ctx: Context) -> str:
+    """restore an attribute value to its previous state by attribute value ID"""
+    endpoint, token = get_backend_param(ctx)
+
+    result = restore_item_attribute_value_api(
+        endpoint=endpoint,
+        token=token,
+        attribute_value_id=attribute_value_id,
+        log_prefix=get_prefix(ctx),
+    )
+
+    return json.dumps(result)
+
 
 COMMON_LIST = [
     get_me,
@@ -195,4 +210,5 @@ COMMON_LIST = [
     get_item_detail,
     search_item,
     advanced_search,
+    restore_item_attribute_value,
 ]

@@ -6,6 +6,7 @@ from mcp_server.drivers.pagoda import (
     advanced_search_api,
     get_item_detail_api,
     get_item_list_api,
+    get_me_api,
     get_model_detail_api,
     get_model_list_api,
     search_item_api,
@@ -173,7 +174,21 @@ def advanced_search(
     return json.dumps(result.model_dump())
 
 
+def get_me(ctx: Context = None) -> str:
+    """get the current authenticated user's profile"""
+    endpoint, token = get_backend_param(ctx)
+
+    user = get_me_api(
+        endpoint=endpoint,
+        token=token,
+        log_prefix=get_prefix(ctx),
+    )
+
+    return json.dumps(user.model_dump())
+
+
 COMMON_LIST = [
+    get_me,
     get_model_list,
     get_model_detail,
     get_item_list,

@@ -9,6 +9,7 @@ from mcp_server.drivers.pagoda import (
     get_me_api,
     get_model_detail_api,
     get_model_list_api,
+    get_user_activity_api,
     restore_item_attribute_value_api,
     search_item_api,
 )
@@ -175,6 +176,26 @@ def advanced_search(
     return json.dumps(result.model_dump())
 
 
+def get_user_activity(
+    user_id: int,
+    since: str = "",
+    within_minutes: int = 0,
+    ctx: Context = None,
+) -> str:
+    """get activity history for a user. since is an ISO 8601 datetime string. within_minutes limits results to activities within that many minutes of since."""
+    endpoint, token = get_backend_param(ctx)
+
+    result = get_user_activity_api(
+        endpoint=endpoint,
+        token=token,
+        user_id=user_id,
+        since=since or None,
+        within_minutes=within_minutes or None,
+    )
+
+    return json.dumps(result)
+
+
 def get_me(ctx: Context = None) -> str:
     """get the current authenticated user's profile"""
     endpoint, token = get_backend_param(ctx)
@@ -210,5 +231,6 @@ COMMON_LIST = [
     get_item_detail,
     search_item,
     advanced_search,
+    get_user_activity,
     restore_item_attribute_value,
 ]

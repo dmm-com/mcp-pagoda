@@ -187,7 +187,7 @@ def get_me(ctx: Context = None) -> str:
 
     return json.dumps(user.model_dump())
 
-  
+
 def restore_item_attribute_value(attribute_value_id: int, ctx: Context) -> str:
     """restore an attribute value to its previous state by attribute value ID"""
     endpoint, token = get_backend_param(ctx)

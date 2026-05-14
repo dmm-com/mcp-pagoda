@@ -290,7 +290,7 @@ def get_me_api(
     Logger.debug(log_prefix + f"get_me_api(Output) {resp.json()}")
     return User(**resp.json())
 
-  
+
 def restore_item_attribute_value_api(
     endpoint: str,
     token: str,

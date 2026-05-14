@@ -9,6 +9,7 @@ from mcp_server.drivers.pagoda import (
     get_model_detail_api,
     get_model_list_api,
     get_user_activity_api,
+    restore_item_attribute_value_api,
     search_item_api,
 )
 from mcp_server.lib.log import get_prefix
@@ -189,6 +190,16 @@ def get_user_activity(
         user_id=user_id,
         since=since or None,
         within_minutes=within_minutes or None,
+
+      
+def restore_item_attribute_value(attribute_value_id: int, ctx: Context) -> str:
+    """restore an attribute value to its previous state by attribute value ID"""
+    endpoint, token = get_backend_param(ctx)
+
+    result = restore_item_attribute_value_api(
+        endpoint=endpoint,
+        token=token,
+        attribute_value_id=attribute_value_id,
         log_prefix=get_prefix(ctx),
     )
 
@@ -203,4 +214,5 @@ COMMON_LIST = [
     search_item,
     advanced_search,
     get_user_activity,
+    restore_item_attribute_value,
 ]

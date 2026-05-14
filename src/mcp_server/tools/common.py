@@ -8,6 +8,7 @@ from mcp_server.drivers.pagoda import (
     get_item_list_api,
     get_model_detail_api,
     get_model_list_api,
+    get_user_activity_api,
     search_item_api,
 )
 from mcp_server.lib.log import get_prefix
@@ -173,6 +174,27 @@ def advanced_search(
     return json.dumps(result.model_dump())
 
 
+def get_user_activity(
+    user_id: int,
+    since: str = "",
+    within_minutes: int = 0,
+    ctx: Context = None,
+) -> str:
+    """get activity history for a user. since is an ISO 8601 datetime string. within_minutes limits results to activities within that many minutes of since."""
+    endpoint, token = get_backend_param(ctx)
+
+    result = get_user_activity_api(
+        endpoint=endpoint,
+        token=token,
+        user_id=user_id,
+        since=since or None,
+        within_minutes=within_minutes or None,
+        log_prefix=get_prefix(ctx),
+    )
+
+    return json.dumps(result)
+
+
 COMMON_LIST = [
     get_model_list,
     get_model_detail,
@@ -180,4 +202,5 @@ COMMON_LIST = [
     get_item_detail,
     search_item,
     advanced_search,
+    get_user_activity,
 ]

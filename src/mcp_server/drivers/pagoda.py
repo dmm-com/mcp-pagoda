@@ -54,6 +54,36 @@ class AdvancedSearchResult(BaseModel):
     values: list[AdvancedSearchResultItem]
 
 
+def get_user_activity_api(
+    endpoint: str,
+    token: str,
+    user_id: int,
+    since: str | None = None,
+    within_minutes: int | None = None,
+    log_prefix: str = "",
+) -> list:
+    Logger.debug(
+        log_prefix
+        + f"get_user_activity_api(Input) user_id={user_id}, since={since}, within_minutes={within_minutes}"
+    )
+    params = {}
+    if since is not None:
+        params["since"] = since
+    if within_minutes is not None:
+        params["within_minutes"] = within_minutes
+
+    resp = request_get(
+        url=endpoint + f"/user/api/v2/{user_id}/activity",
+        params=params,
+        token=token,
+    )
+    if resp.status_code != 200:
+        raise RuntimeError(f"Request failed /user/api/v2/{user_id}/activity")
+
+    Logger.debug(log_prefix + f"get_user_activity_api(Output) {resp.json()}")
+    return resp.json()
+
+
 def request_to_airone(
     method: Callable, url: str, token: str, params: dict | None, data: dict | None
 ) -> requests.Response:

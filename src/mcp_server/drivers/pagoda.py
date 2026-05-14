@@ -84,6 +84,12 @@ def request_post(
     return request_to_airone(requests.post, url, token, params, data)
 
 
+def request_patch(
+    url: str, token: str, params: dict | None = None, data: dict | None = None
+) -> requests.Response:
+    return request_to_airone(requests.patch, url, token, params, data)
+
+
 def get_model_list_api(
     endpoint: str,
     token: str,
@@ -253,6 +259,35 @@ def get_item_detail_api(
 
     Logger.debug(log_prefix + f"get_item_detail_api(Output) {resp.json()}")
     return ItemDetail(**resp.json())
+
+
+def restore_item_attribute_value_api(
+    endpoint: str,
+    token: str,
+    attribute_value_id: int,
+    log_prefix: str = "",
+) -> dict:
+    """
+    This restores an attribute value via the Pagoda API.
+    """
+    Logger.debug(
+        log_prefix
+        + f"restore_item_attribute_value_api(Input) attribute_value_id={attribute_value_id}"
+    )
+    resp = request_patch(
+        url=endpoint + f"/entry/api/v2/{attribute_value_id}/attrv_restore/",
+        token=token,
+        data={},
+    )
+    if not (200 <= resp.status_code < 300):
+        raise RuntimeError(
+            f"Request failed /entry/api/v2/{attribute_value_id}/attrv_restore/ "
+            f"status={resp.status_code}"
+        )
+
+    result = resp.json() if resp.content else {}
+    Logger.debug(log_prefix + f"restore_item_attribute_value_api(Output) {result}")
+    return result
 
 
 def search_item_api(

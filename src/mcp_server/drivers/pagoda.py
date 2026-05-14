@@ -82,8 +82,8 @@ def get_user_activity_api(
 
     Logger.debug(log_prefix + f"get_user_activity_api(Output) {resp.json()}")
     return resp.json()
-  
-  
+
+
 class CoUser(BaseModel):
     user_id: int
     username: str

@@ -191,8 +191,11 @@ def get_user_activity(
         user_id=user_id,
         since=since or None,
         within_minutes=within_minutes or None,
+    )
 
-      
+    return json.dumps(result)
+
+
 def get_me(ctx: Context = None) -> str:
     """get the current authenticated user's profile"""
     endpoint, token = get_backend_param(ctx)

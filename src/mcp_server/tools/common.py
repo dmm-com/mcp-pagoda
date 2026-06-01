@@ -11,6 +11,7 @@ from mcp_server.drivers.pagoda import (
     get_model_list_api,
     get_user_activity_api,
     restore_item_attribute_value_api,
+    rollback_items_api,
     search_item_api,
 )
 from mcp_server.lib.log import get_prefix
@@ -223,6 +224,21 @@ def restore_item_attribute_value(attribute_value_id: int, ctx: Context) -> str:
     return json.dumps(result)
 
 
+def rollback_items(targets: list[int], at: str, ctx: Context = None) -> str:
+    """roll back items to their configuration state at the specified datetime. targets is a list of item IDs. at is an ISO 8601 datetime string."""
+    endpoint, token = get_backend_param(ctx)
+
+    result = rollback_items_api(
+        endpoint=endpoint,
+        token=token,
+        targets=targets,
+        at=at,
+        log_prefix=get_prefix(ctx),
+    )
+
+    return json.dumps(result)
+
+
 COMMON_LIST = [
     get_me,
     get_model_list,
@@ -233,4 +249,5 @@ COMMON_LIST = [
     advanced_search,
     get_user_activity,
     restore_item_attribute_value,
+    rollback_items,
 ]

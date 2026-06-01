@@ -372,6 +372,35 @@ def search_item_api(
     return [Item(**result) for result in results]
 
 
+def rollback_items_api(
+    endpoint: str,
+    token: str,
+    targets: list[int],
+    at: str,
+    log_prefix: str = "",
+) -> dict:
+    """
+    This rolls back items to their state at the specified datetime via the Pagoda API.
+    """
+    Logger.debug(
+        log_prefix
+        + f"rollback_items_api(Input) targets={targets}, at={at}"
+    )
+    resp = request_post(
+        url=endpoint + "/entry/api/v2/rollback",
+        token=token,
+        data={"targets": targets, "at": at},
+    )
+    if not (200 <= resp.status_code < 300):
+        raise RuntimeError(
+            f"Request failed /entry/api/v2/rollback status={resp.status_code}"
+        )
+
+    result = resp.json() if resp.content else {}
+    Logger.debug(log_prefix + f"rollback_items_api(Output) {result}")
+    return result
+
+
 def get_router_topology(
     endpoint: str,
     token: str,

@@ -180,10 +180,11 @@ def advanced_search(
 def get_user_activity(
     user_id: int,
     since: str = "",
+    to: str = "",
     within_minutes: int = 0,
     ctx: Context = None,
 ) -> str:
-    """get activity history for a user. since is an ISO 8601 datetime string. within_minutes limits results to activities within that many minutes of since."""
+    """get activity history for a user. since and to are ISO 8601 datetime strings that define the start and end of the time range. within_minutes limits results to activities within that many minutes of since."""
     endpoint, token = get_backend_param(ctx)
 
     result = get_user_activity_api(
@@ -191,6 +192,7 @@ def get_user_activity(
         token=token,
         user_id=user_id,
         since=since or None,
+        to=to or None,
         within_minutes=within_minutes or None,
     )
 

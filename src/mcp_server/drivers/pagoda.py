@@ -385,10 +385,7 @@ def rollback_items_api(
     """
     This rolls back items to their state at the specified datetime via the Pagoda API.
     """
-    Logger.debug(
-        log_prefix
-        + f"rollback_items_api(Input) targets={targets}, at={at}"
-    )
+    Logger.debug(log_prefix + f"rollback_items_api(Input) targets={targets}, at={at}")
     resp = request_post(
         url=endpoint + "/entry/api/v2/rollback/",
         token=token,

@@ -59,16 +59,19 @@ def get_user_activity_api(
     token: str,
     user_id: int,
     since: str | None = None,
+    to: str | None = None,
     within_minutes: int | None = None,
     log_prefix: str = "",
 ) -> list:
     Logger.debug(
         log_prefix
-        + f"get_user_activity_api(Input) user_id={user_id}, since={since}, within_minutes={within_minutes}"
+        + f"get_user_activity_api(Input) user_id={user_id}, since={since}, to={to}, within_minutes={within_minutes}"
     )
     params = {}
     if since is not None:
         params["since"] = since
+    if to is not None:
+        params["to"] = to
     if within_minutes is not None:
         params["within_minutes"] = within_minutes
 
@@ -370,6 +373,32 @@ def search_item_api(
 
     Logger.debug(log_prefix + f"search_item_api(Output) {results}")
     return [Item(**result) for result in results]
+
+
+def rollback_items_api(
+    endpoint: str,
+    token: str,
+    targets: list[int],
+    at: str,
+    log_prefix: str = "",
+) -> dict:
+    """
+    This rolls back items to their state at the specified datetime via the Pagoda API.
+    """
+    Logger.debug(log_prefix + f"rollback_items_api(Input) targets={targets}, at={at}")
+    resp = request_post(
+        url=endpoint + "/entry/api/v2/rollback/",
+        token=token,
+        data={"targets": targets, "at": at},
+    )
+    if not (200 <= resp.status_code < 300):
+        raise RuntimeError(
+            f"Request failed /entry/api/v2/rollback status={resp.status_code}"
+        )
+
+    result = resp.json() if resp.content else {}
+    Logger.debug(log_prefix + f"rollback_items_api(Output) {result}")
+    return result
 
 
 def get_router_topology(

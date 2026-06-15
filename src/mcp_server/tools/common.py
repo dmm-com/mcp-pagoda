@@ -11,6 +11,7 @@ from mcp_server.drivers.pagoda import (
     get_model_list_api,
     get_user_activity_api,
     restore_item_attribute_value_api,
+    rollback_items_api,
     search_item_api,
 )
 from mcp_server.lib.log import get_prefix
@@ -179,10 +180,11 @@ def advanced_search(
 def get_user_activity(
     user_id: int,
     since: str = "",
+    to: str = "",
     within_minutes: int = 0,
     ctx: Context = None,
 ) -> str:
-    """get activity history for a user. since is an ISO 8601 datetime string. within_minutes limits results to activities within that many minutes of since."""
+    """get activity history for a user. since and to are ISO 8601 datetime strings that define the start and end of the time range. within_minutes limits results to activities within that many minutes of since."""
     endpoint, token = get_backend_param(ctx)
 
     result = get_user_activity_api(
@@ -190,6 +192,7 @@ def get_user_activity(
         token=token,
         user_id=user_id,
         since=since or None,
+        to=to or None,
         within_minutes=within_minutes or None,
     )
 
@@ -223,6 +226,21 @@ def restore_item_attribute_value(attribute_value_id: int, ctx: Context) -> str:
     return json.dumps(result)
 
 
+def rollback_items(targets: list[int], at: str, ctx: Context = None) -> str:
+    """roll back items to their configuration state at the specified datetime. targets is a list of item IDs. at is an ISO 8601 datetime string."""
+    endpoint, token = get_backend_param(ctx)
+
+    result = rollback_items_api(
+        endpoint=endpoint,
+        token=token,
+        targets=targets,
+        at=at,
+        log_prefix=get_prefix(ctx),
+    )
+
+    return json.dumps(result)
+
+
 COMMON_LIST = [
     get_me,
     get_model_list,
@@ -233,4 +251,5 @@ COMMON_LIST = [
     advanced_search,
     get_user_activity,
     restore_item_attribute_value,
+    rollback_items,
 ]

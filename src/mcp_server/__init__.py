@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from typing import Literal
 
@@ -50,12 +49,14 @@ def main(
 ) -> None:
     Logger.setLevel(logging.getLevelName(loglevel))
 
+    # NOTE: Both serve_stdio() and serve_sse() are synchronous functions that run
+    # their own event loop internally, so they must not be wrapped by asyncio.run().
     match transport:
         case "stdio":
-            asyncio.run(serve_stdio(endpoint, token))
+            serve_stdio(endpoint, token)
 
         case "sse":
-            asyncio.run(serve_sse(host, port, auth, endpoint, token))
+            serve_sse(host, port, auth, endpoint, token)
 
 
 if __name__ == "__main__":

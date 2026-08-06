@@ -22,5 +22,9 @@ Logger.addHandler(my_handler)
 
 
 def get_prefix(ctx: Context) -> str:
+    # NOTE: The stdio transport has no HTTP request, so "request" is None there.
+    # It can also be None-client when the peer address is unavailable.
     request = ctx.request_context.request
+    if request is None or request.client is None:
+        return ""
     return f"[From:{request.client.host}] "

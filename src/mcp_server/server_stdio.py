@@ -36,7 +36,9 @@ def serve(endpoint: str, token: str) -> int:
     # initialize Pagoda instance
     from mcp_server.tools.common import Pagoda
 
-    Pagoda.initialize(endpoint=endpoint, token=token)
+    # stdio transport has no per-request authentication, so the token that is
+    # passed by the "--token" option is always used to access Pagoda.
+    Pagoda.initialize(endpoint=endpoint, token=token, is_bearer=False)
 
     mcp_server = create_mcp_server()
     mcp_server.run(transport="stdio")

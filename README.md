@@ -314,6 +314,7 @@ These are the MCP Tools that MCP Pagoda provides, classified by categories.
 | restore_item_attribute_value | Common | Restore an attribute value to its previous state |
 | rollback_items | Common | Roll back Items to their state at specified datetime |
 | get_rack_list | Datacenter | List all rack item infomation that contains appliances |
+| ping_check | Network | Check IP reachability for a CIDR via ping |
 | router_topology | Router | Get infomation that describes physical network topology |
 
 Here is the description of each categories.

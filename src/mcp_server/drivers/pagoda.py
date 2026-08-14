@@ -420,3 +420,28 @@ def get_router_topology(
 
     Logger.debug(log_prefix + f"get_router_topology(Output) {resp.json()}")
     return resp.json()
+
+
+def ping_check_api(
+    endpoint: str,
+    token: str,
+    cidr: str,
+    log_prefix: str = "",
+) -> dict:
+    """
+    This checks IP reachability via the Pagoda API.
+    """
+    Logger.debug(log_prefix + f"ping_check_api(Input) cidr={cidr}")
+    resp = request_post(
+        url=endpoint + "/api/v2/custom/network/ping_check/",
+        token=token,
+        data={"cidr": cidr},
+    )
+    if not (200 <= resp.status_code < 300):
+        raise RuntimeError(
+            f"Request failed /api/v2/custom/network/ping_check/ status={resp.status_code}"
+        )
+
+    result = resp.json() if resp.content else {}
+    Logger.debug(log_prefix + f"ping_check_api(Output) {result}")
+    return result

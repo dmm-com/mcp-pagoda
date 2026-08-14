@@ -8,19 +8,19 @@ from mcp_server.tools.common import get_backend_param
 
 
 def ping_check(cidr: str, ctx: Context = None) -> str:
-	"""check IP reachability for a CIDR"""
-	endpoint, token = get_backend_param(ctx)
+    """check IP reachability for a CIDR"""
+    endpoint, token = get_backend_param(ctx)
 
-	result = ping_check_api(
-		endpoint=endpoint,
-		token=token,
-		cidr=cidr,
-		log_prefix=get_prefix(ctx),
-	)
+    result = ping_check_api(
+        endpoint=endpoint,
+        token=token,
+        cidr=cidr,
+        log_prefix=get_prefix(ctx),
+    )
 
-	return json.dumps(result)
+    return json.dumps(result)
 
 
 NETWORK_LIST = [
-	ping_check,
+    ping_check,
 ]

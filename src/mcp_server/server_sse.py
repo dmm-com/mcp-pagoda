@@ -11,9 +11,10 @@ from mcp_server.lib.pagoda import is_token_valid
 from mcp_server.prompts.lb import LB_LIST
 from mcp_server.tools.common import COMMON_LIST
 from mcp_server.tools.datacenter import DC_LIST
+from mcp_server.tools.network import NETWORK_LIST
 from mcp_server.tools.router import ROUTER_LIST
 
-TOOL_LIST = COMMON_LIST + DC_LIST + ROUTER_LIST
+TOOL_LIST = COMMON_LIST + DC_LIST + NETWORK_LIST + ROUTER_LIST
 PROMPT_LIST = LB_LIST
 
 

@@ -316,6 +316,14 @@ These are the MCP Tools that MCP Pagoda provides, classified by categories.
 | get_rack_list | Datacenter | List all rack item infomation that contains appliances |
 | ping_check | Network | Check IP reachability for a CIDR via ping |
 | router_topology | Router | Get infomation that describes physical network topology |
+| get_tulta_my_contacts | Tulta | List the Tulta contact Items of the authenticated user |
+| get_tulta_my_rotations | Tulta | List the Tulta rotations (teams) that the authenticated user belongs to |
+| get_tulta_rotation_list | Tulta | List all Tulta rotation Items |
+| get_tulta_rotation_schedule | Tulta | Get on-call members of a rotation for each day of a term |
+| get_tulta_my_schedule | Tulta | Get on-call members of every rotation of the authenticated user (e.g. this week) |
+| get_tulta_rotation_detail | Tulta | Get layers, units, members and overrides of a rotation |
+| set_tulta_rotation_override | Tulta | Override (or clear) the on-call members of a rotation on a single date |
+| swap_tulta_rotation_members | Tulta | Exchange the duties of two on-call members within a term |
 
 Here is the description of each categories.
 
@@ -325,6 +333,7 @@ Here is the description of each categories.
 | Datacenter | Features about DCIM (e.g. Rack, Appliances and so on) |
 | Network    | Features about Network (e.g. IPaddress and Network) |
 | Router     | Features for physical configuration diagram of Network appliances connection |
+| Tulta      | Features about the on-call rotation ("輪番") of Tulta |
 
 MCP Prompts are also provided.
 

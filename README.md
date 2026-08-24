@@ -337,11 +337,14 @@ MCP Prompts are also provided.
 Use MCP Inspector.
 
 ```
-$ npx @modelcontextprotocol/inspector uv run mcp-server \
+$ npx @modelcontextprotocol/inspector -- uv run mcp-server \
   --transport stdio \
   --endpoint "{Pagoda URL}" \
   --token "{Access token of Pagoda}"
 ```
+
+The `--` separator is required so that options such as `--transport stdio` are passed to
+`mcp-server`, not consumed by the Inspector CLI.
 
 For the SSE server, start the Inspector without arguments, then choose the `SSE` transport
 type and enter `http://localhost:8000/sse` with a Bearer token.

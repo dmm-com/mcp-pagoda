@@ -21,6 +21,22 @@ Logger.setLevel(logging.WARNING)
 Logger.addHandler(my_handler)
 
 
-def get_prefix(ctx: Context) -> str:
-    request = ctx.request_context.request
+def get_prefix(ctx: Context | None) -> str:
+    """Returns the log prefix that tells where the request came from.
+
+    The HTTP request is available only with the "sse" transport. The "stdio" one
+    has no per-request HTTP context, so an empty prefix is returned there instead
+    of raising an error.
+    """
+    if ctx is None:
+        return ""
+
+    try:
+        request = ctx.request_context.request
+    except (AttributeError, ValueError):
+        return ""
+
+    if request is None or request.client is None:
+        return ""
+
     return f"[From:{request.client.host}] "

@@ -136,6 +136,12 @@ def request_patch(
     return request_to_airone(requests.patch, url, token, params, data)
 
 
+def request_put(
+    url: str, token: str, params: dict | None = None, data: dict | None = None
+) -> requests.Response:
+    return request_to_airone(requests.put, url, token, params, data)
+
+
 def get_model_list_api(
     endpoint: str,
     token: str,
@@ -419,6 +425,163 @@ def get_router_topology(
         raise RuntimeError("/api/v2/custom/network/get_router_topology/")
 
     Logger.debug(log_prefix + f"get_router_topology(Output) {resp.json()}")
+    return resp.json()
+
+
+def search_chain_api(
+    endpoint: str,
+    token: str,
+    entities: list[str],
+    attrs: list[dict],
+    log_prefix: str = "",
+) -> list[Item]:
+    """
+    This searches Items by chaining referral Attributes of them.
+
+    The condition tree ("attrs") is the same one that the Pagoda UI sends, e.g.
+    [{"name": "一次対応輪番", "attrs": [{"name": "ユニット", "attrs": [...]}]}].
+    see airone: entry/api_v2/urls.py (advanced_search_chain/) and
+    api_v1/entry/serializer.py (EntrySearchChainSerializer)
+    """
+    Logger.debug(
+        log_prefix + f"search_chain_api(Input) entities={entities}, attrs={attrs}"
+    )
+    resp = request_post(
+        url=endpoint + "/entry/api/v2/advanced_search_chain/",
+        token=token,
+        data={"entities": entities, "attrs": attrs},
+    )
+    if resp.status_code != 200:
+        raise RuntimeError(
+            f"Request failed /entry/api/v2/advanced_search_chain/ "
+            f"status={resp.status_code} body={resp.text}"
+        )
+
+    Logger.debug(log_prefix + f"search_chain_api(Output) {resp.json()}")
+    return [Item(**result) for result in resp.json()]
+
+
+def get_tulta_myself_api(
+    endpoint: str,
+    token: str,
+    log_prefix: str = "",
+) -> list[dict]:
+    """
+    This retrieves the Tulta contact ("Tulta連絡先") Items that the authenticated
+    user has registered by themselves.
+
+    see airone: custom_view/api_v2/tulta/urls.py ("myself/") and
+    custom_view/api_v2/tulta/views.py (SelfInformationAPI)
+    """
+    Logger.debug(log_prefix + "get_tulta_myself_api(Input)")
+    resp = request_get(
+        url=endpoint + "/api/v2/custom/tulta/myself/",
+        token=token,
+    )
+    if resp.status_code != 200:
+        raise RuntimeError(
+            f"Request failed /api/v2/custom/tulta/myself/ status={resp.status_code}"
+        )
+
+    Logger.debug(log_prefix + f"get_tulta_myself_api(Output) {resp.json()}")
+    return resp.json()
+
+
+def get_tulta_rotation_api(
+    endpoint: str,
+    token: str,
+    rotation_item_id: int,
+    log_prefix: str = "",
+) -> dict:
+    """
+    This retrieves the whole structure (layers, units, members and overrides) of
+    the specified Tulta rotation ("Tulta輪番") Item.
+
+    see airone: custom_view/api_v2/tulta/urls.py ("<int:entry_id>/") and
+    custom_view/api_v2/tulta/serializers.py (TultaRetrieveRotationSerializer)
+    """
+    Logger.debug(
+        log_prefix
+        + f"get_tulta_rotation_api(Input) rotation_item_id={rotation_item_id}"
+    )
+    resp = request_get(
+        url=endpoint + f"/api/v2/custom/tulta/{rotation_item_id}/",
+        token=token,
+    )
+    if resp.status_code != 200:
+        raise RuntimeError(
+            f"Request failed /api/v2/custom/tulta/{rotation_item_id}/ "
+            f"status={resp.status_code} body={resp.text}"
+        )
+
+    Logger.debug(log_prefix + f"get_tulta_rotation_api(Output) {resp.json()}")
+    return resp.json()
+
+
+def update_tulta_rotation_api(
+    endpoint: str,
+    token: str,
+    rotation_item_id: int,
+    data: dict,
+    log_prefix: str = "",
+) -> dict:
+    """
+    This updates the specified Tulta rotation Item. The Pagoda side accepts only
+    the full representation (PATCH is disabled at its urls.py), so "data" must
+    carry every layer and override that has to be kept.
+
+    see airone: custom_view/api_v2/tulta/urls.py ("<int:entry_id>/") and
+    custom_view/api_v2/tulta/serializers.py (TultaUpdateRotationSerializer)
+    """
+    Logger.debug(
+        log_prefix
+        + f"update_tulta_rotation_api(Input) rotation_item_id={rotation_item_id}, data={data}"
+    )
+    resp = request_put(
+        url=endpoint + f"/api/v2/custom/tulta/{rotation_item_id}/",
+        token=token,
+        data=data,
+    )
+    if not (200 <= resp.status_code < 300):
+        raise RuntimeError(
+            f"Request failed /api/v2/custom/tulta/{rotation_item_id}/ "
+            f"status={resp.status_code} body={resp.text}"
+        )
+
+    result = resp.json() if resp.content else {}
+    Logger.debug(log_prefix + f"update_tulta_rotation_api(Output) {result}")
+    return result
+
+
+def get_tulta_rotation_terms_api(
+    endpoint: str,
+    token: str,
+    rotation_item_id: int,
+    src_date: str,
+    dst_date: str,
+    log_prefix: str = "",
+) -> dict:
+    """
+    This retrieves on-call members of the primary rotation for each day between
+    src_date and dst_date, e.g. {"2026-08-24": [{"name": "denji", "order": 1}]}.
+
+    see airone: custom_view/api_v2/tulta/urls.py ("members/terms/...") and
+    custom_view/api_v2/tulta/views.py (TultaRetrieveMembersWithTermAPI)
+    """
+    Logger.debug(
+        log_prefix + f"get_tulta_rotation_terms_api(Input) rotation_item_id="
+        f"{rotation_item_id}, src_date={src_date}, dst_date={dst_date}"
+    )
+    path = (
+        f"/api/v2/custom/tulta/members/terms/{rotation_item_id}/{src_date}/{dst_date}/"
+    )
+    resp = request_get(url=endpoint + path, token=token)
+    if resp.status_code != 200:
+        raise RuntimeError(
+            f"Request failed {path} status={resp.status_code} body={resp.text}"
+        )
+
+    Logger.debug(log_prefix + f"get_tulta_rotation_terms_api(Output) {resp.json()}")
     return resp.json()
 
 

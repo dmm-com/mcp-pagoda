@@ -7,8 +7,9 @@ from mcp_server.tools.common import COMMON_LIST
 from mcp_server.tools.datacenter import DC_LIST
 from mcp_server.tools.network import NETWORK_LIST
 from mcp_server.tools.router import ROUTER_LIST
+from mcp_server.tools.tulta import TULTA_LIST
 
-TOOL_LIST = COMMON_LIST + DC_LIST + NETWORK_LIST + ROUTER_LIST
+TOOL_LIST = COMMON_LIST + DC_LIST + NETWORK_LIST + ROUTER_LIST + TULTA_LIST
 PROMPT_LIST = LB_LIST
 
 TOOL_ROUTERS = dict()
